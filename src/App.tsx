@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useContext} from 'react';
 import './App.css';
+import MyAppBar from "./appBar/AppBar";
+import {Route, Switch} from "react-router";
+import Routes from "./routes/Routes";
+import NotFound from "./pages/NotFound";
+import {RouteInformation} from "./dto/RouteInformation";
+import {RouteContext, RouteContextInfo} from "./routes/RoutesContext";
+import RouteContextProvider from "./routes/RoutesContext";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+export default function App() {
+    return (
+        <RouteContextProvider>
+            <div className="App">
+                <MyAppBar />
+                <MySwitch />
+            </div>
+        </RouteContextProvider>
+    );
 }
 
-export default App;
+const MySwitch = () =>  {
+
+    const { id, updateId, switchInfo } = useContext(RouteContext) as RouteContextInfo;
+    console.log("DPC: " + id);
+
+    updateId(BigInt(10));
+    console.log("DPC: " + id);
+    return (
+        <Switch>
+            {
+                Routes.map((route: RouteInformation) => (
+                    <Route exact path={route.path} key={route.path} render={() => {
+                        switchInfo(route.appBarInfo);
+                        console.log("AAAAA");
+                        return <route.component/>
+                    }}/>
+                ))
+            }
+            <Route component={NotFound} />
+        </Switch>
+    )
+
+};
